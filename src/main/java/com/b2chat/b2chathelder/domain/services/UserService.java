@@ -8,7 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.b2chat.b2chathelder.domain.dto.UserCreateInput;
 import com.b2chat.b2chathelder.domain.dto.UserUpdateInput;
-import com.b2chat.b2chathelder.domain.exceptions.ConflictUniqueConstraintException;
+import com.b2chat.b2chathelder.domain.exceptions.UniqueConstraintException;
 import com.b2chat.b2chathelder.domain.exceptions.NotFoundException;
 import com.b2chat.b2chathelder.domain.models.User;
 import com.b2chat.b2chathelder.domain.ports.UserPersistencePort;
@@ -37,13 +37,13 @@ public class UserService {
 		// validate that the username is unique
 		final String USERNAME = userCreateInput.getUsername();
 		if (userPersistencePort.existsUsername(USERNAME)) {
-			throw new ConflictUniqueConstraintException("Username " + USERNAME + " already exists");
+			throw new UniqueConstraintException("Username " + USERNAME + " already exists");
 		}
 
 		// validate that the email is unique
 		final String EMAIL = userCreateInput.getEmail();
 		if (userPersistencePort.existsEmail(EMAIL)) {
-			throw new ConflictUniqueConstraintException("Email " + EMAIL + " already exists");
+			throw new UniqueConstraintException("Email " + EMAIL + " already exists");
 		}
 
 		// TODO pending add spring security and encryp password
@@ -74,7 +74,7 @@ public class UserService {
 		// verify that the username is not being used by another registry
 		final String USERNAME = userUpdateInput.getUsername();
 		if (userPersistencePort.usernameExistsWithAnotherId(id, USERNAME)) {
-			throw new ConflictUniqueConstraintException(
+			throw new UniqueConstraintException(
 					"Username " + USERNAME + " is already used by another registration");
 		}
 

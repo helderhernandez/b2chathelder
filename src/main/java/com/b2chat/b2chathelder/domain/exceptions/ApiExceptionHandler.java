@@ -33,7 +33,7 @@ public class ApiExceptionHandler {
 	}
 
 	@ResponseStatus(HttpStatus.CONFLICT)
-	@ExceptionHandler({ ConflictUniqueConstraintException.class })
+	@ExceptionHandler({ UniqueConstraintException.class })
 	@ResponseBody
 	public String handleConflictUniqueConstraintException(HttpServletRequest request, Exception exception) {
 		return exception.getMessage();
