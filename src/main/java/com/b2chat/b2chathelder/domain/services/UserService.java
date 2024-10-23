@@ -3,13 +3,14 @@ package com.b2chat.b2chathelder.domain.services;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.b2chat.b2chathelder.domain.dto.UserCreateInput;
 import com.b2chat.b2chathelder.domain.dto.UserUpdateInput;
-import com.b2chat.b2chathelder.domain.exceptions.UniqueConstraintException;
 import com.b2chat.b2chathelder.domain.exceptions.NotFoundException;
+import com.b2chat.b2chathelder.domain.exceptions.UniqueConstraintException;
 import com.b2chat.b2chathelder.domain.models.User;
 import com.b2chat.b2chathelder.domain.ports.UserPersistencePort;
 
@@ -24,6 +25,9 @@ public class UserService {
 
 	@Autowired
 	private Validator validator;
+
+	@Autowired
+	private PasswordEncoder passwordEncoder;
 
 	@Transactional(rollbackFor = Exception.class)
 	public User create(UserCreateInput userCreateInput) {
@@ -46,8 +50,8 @@ public class UserService {
 			throw new UniqueConstraintException("Email " + EMAIL + " already exists");
 		}
 
-		// TODO pending add spring security and encryp password
-		String password = userCreateInput.getPassword();
+		// encryp password
+		String password = passwordEncoder.encode(userCreateInput.getPassword());
 
 		return userPersistencePort.create(USERNAME, password, EMAIL);
 	}
@@ -74,12 +78,11 @@ public class UserService {
 		// verify that the username is not being used by another registry
 		final String USERNAME = userUpdateInput.getUsername();
 		if (userPersistencePort.usernameExistsWithAnotherId(id, USERNAME)) {
-			throw new UniqueConstraintException(
-					"Username " + USERNAME + " is already used by another registration");
+			throw new UniqueConstraintException("Username " + USERNAME + " is already used by another registration");
 		}
 
-		// TODO pending add spring security and encryp password
-		String password = userUpdateInput.getPassword();
+		// encryp password
+		String password = passwordEncoder.encode(userUpdateInput.getPassword());
 
 		return userPersistencePort.update(id, USERNAME, password, userUpdateInput.getIsActive());
 	}
