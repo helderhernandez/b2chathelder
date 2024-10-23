@@ -52,6 +52,8 @@ public class UserPersistenceAdapter implements UserPersistencePort {
 	public User update(Long id, String username, String password, boolean isActive) {
 		UserEntity userEntity = userRepository.getReferenceById(id);
 
+		// NOTE: The email field is not considered for the update
+		
 		userEntity.setUsername(username);
 		userEntity.setPassword(password);
 		userEntity.setActive(isActive);
@@ -69,5 +71,16 @@ public class UserPersistenceAdapter implements UserPersistencePort {
 	@Override
 	public boolean usernameExistsWithAnotherId(Long id, String username) {
 		return userRepository.existsByIdNotAndUsernameAndIsDeleteFalse(id, username);
+	}
+
+	@Override
+	public void delete(Long id) {
+		UserEntity userEntity = userRepository.getReferenceById(id);
+
+		// mark as inactive and deleted
+		userEntity.setActive(false);
+		userEntity.setDelete(true);
+
+		userRepository.save(userEntity);		
 	}
 }

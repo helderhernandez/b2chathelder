@@ -16,4 +16,6 @@ public interface UserPersistencePort {
 	boolean existsById(Long id);
 
 	boolean usernameExistsWithAnotherId(Long id, String username);
+	
+	void delete(Long id);
 }

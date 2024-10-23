@@ -1,4 +1,4 @@
-package com.b2chat.b2chathelder.domain.ports;
+package com.b2chat.b2chathelder.domain.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

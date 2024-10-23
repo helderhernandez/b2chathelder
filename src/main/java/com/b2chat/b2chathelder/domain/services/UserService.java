@@ -6,20 +6,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.b2chat.b2chathelder.domain.dto.UserCreateInput;
+import com.b2chat.b2chathelder.domain.dto.UserUpdateInput;
 import com.b2chat.b2chathelder.domain.exceptions.ConflictUniqueConstraintException;
 import com.b2chat.b2chathelder.domain.exceptions.NotFoundException;
 import com.b2chat.b2chathelder.domain.models.User;
-import com.b2chat.b2chathelder.domain.ports.UserCasesPort;
-import com.b2chat.b2chathelder.domain.ports.UserCreateInput;
 import com.b2chat.b2chathelder.domain.ports.UserPersistencePort;
-import com.b2chat.b2chathelder.domain.ports.UserUpdateInput;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Validator;
 
 @Service
-public class UserService implements UserCasesPort {
+public class UserService {
 	@Autowired
 	private UserPersistencePort userPersistencePort;
 
@@ -27,7 +26,6 @@ public class UserService implements UserCasesPort {
 	private Validator validator;
 
 	@Transactional(rollbackFor = Exception.class)
-	@Override
 	public User create(UserCreateInput userCreateInput) {
 		// validate form fields
 		Set<ConstraintViolation<UserCreateInput>> violations = validator.validate(userCreateInput);
@@ -55,13 +53,11 @@ public class UserService implements UserCasesPort {
 	}
 
 	@Transactional(readOnly = true)
-	@Override
-	public User readById(Long id) {
+	public User read(Long id) {
 		return userPersistencePort.findById(id);
 	}
 
 	@Transactional(rollbackFor = Exception.class)
-	@Override
 	public User update(Long id, UserUpdateInput userUpdateInput) {
 		// validate form fields
 		Set<ConstraintViolation<UserUpdateInput>> violations = validator.validate(userUpdateInput);
@@ -88,10 +84,14 @@ public class UserService implements UserCasesPort {
 		return userPersistencePort.update(id, USERNAME, password, userUpdateInput.getIsActive());
 	}
 
-	@Override
+	@Transactional(rollbackFor = Exception.class)
 	public void delete(Long id) {
-		// TODO delete endpoint user
+		// verify that the record exists
+		if (userPersistencePort.existsById(id) == false) {
+			throw new NotFoundException("Not found user with id " + id);
+		}
 
+		userPersistencePort.delete(id);
 	}
 
 }
