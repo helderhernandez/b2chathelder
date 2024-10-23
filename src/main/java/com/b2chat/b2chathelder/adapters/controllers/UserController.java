@@ -1,4 +1,4 @@
-package com.b2chat.b2chathelder.adapters.controller;
+package com.b2chat.b2chathelder.adapters.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,8 +20,11 @@ import com.b2chat.b2chathelder.domain.services.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping(UserController.URI_USERS)
 public class UserController {
+	public static final String URI_USERS = "/users";
+	public static final String URI_ID = "/{id}";
+
 	@Autowired
 	private UserService userService;
 
@@ -32,21 +35,21 @@ public class UserController {
 		return userService.create(userCreateInput);
 	}
 
-	@GetMapping("/{id}")
+	@GetMapping(URI_ID)
 	@ResponseStatus(HttpStatus.OK)
 	@Operation(summary = "Retrieving user by id")
 	public User read(@PathVariable Long id) {
 		return userService.read(id);
 	}
 
-	@PutMapping("/{id}")
+	@PutMapping(URI_ID)
 	@ResponseStatus(HttpStatus.OK)
 	@Operation(summary = "Updating user information")
 	public User update(@PathVariable Long id, @RequestBody UserUpdateInput userUpdateInput) {
 		return userService.update(id, userUpdateInput);
 	}
 
-	@DeleteMapping("/{id}")
+	@DeleteMapping(URI_ID)
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	@Operation(summary = "Deleting a user")
 	public void delete(@PathVariable Long id) {
